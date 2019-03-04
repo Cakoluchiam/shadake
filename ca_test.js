@@ -1,4 +1,5 @@
 // SEE BELOW UNDER "GET STUFF" FOR ACTUAL CONTENT FETCH EXAMPLE
+document.getElementById('content').appendChild(document.createTextNode('Loading content…\n'));
 
 // Client ID and API key from the Developer Console
 var CLIENT_ID = '349213903572-kpj1jgjfqcumch94jo0gn07gfiu70c3c.apps.googleusercontent.com';
