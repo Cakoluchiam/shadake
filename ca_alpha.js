@@ -2,26 +2,14 @@
  *  Here's where we do stuff. Well, first some housekeeping to make sure we're signed in and can manipulate the sheets.
  */
 
-// First, wait to do stuff until the user is signed in.
-gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-
-// Handle the initial sign-in state
-updateSignInStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-
-function updateSignInStatus(isSignedIn) {
-  if (isSignedIn) {
-    sign_in();
-  } else {
-    sign_out();
-  }
-}
-
 // Anything special when the user signs in. For now let's just initialize everything by default.
+// Called by sheets_auth.js once the user is signed in, and each time the user authorizes thereafter
 function sign_in() {
   start();
 }
 
 // Anything special when the user signs out. Clean-up for reinitialization etc.
+// Called by sheets_auth.js whenever the user signs out
 function sign_out() {}
 
 /**
