@@ -54,9 +54,13 @@ function updateSigninStatus(isSignedIn) {
   if (isSignedIn) {
     authorizeButton.style.display = 'none';
     signoutButton.style.display = 'block';
+    // Calls the sign-in function defined by the page.
+    sign_in();
   } else {
     authorizeButton.style.display = 'block';
     signoutButton.style.display = 'none';
+    // Calls the sign-out function defined by the page.
+    sign_out();
   }
 }
 
