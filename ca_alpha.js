@@ -43,7 +43,7 @@ function start() {
   request.then(function(response) {
     var range = response.result;
     if (range.values.length > 0) {
-      appendPre('FETCH TEST\nCol.B2+, Col.D2+:');
+      appendPre('GET TEST\nCol.B2+, Col.D2+:');
       for (i = 0; i < range.values.length; i++) {
         var row = range.values[i];
         // Print columns B and D, which correspond to indices 0 and 2.
@@ -60,13 +60,13 @@ function start() {
   // See https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/update
   params = {
     // The ID of the spreadsheet to update.
-    spreadsheetId: '1k1mtGDWUmDmOh8qCV8CK5gcY6cIoKmG7KmS6hS-b49k',  // TODO: Update placeholder value.
+    spreadsheetId: '1k1mtGDWUmDmOh8qCV8CK5gcY6cIoKmG7KmS6hS-b49k',
 
     // The A1 notation of the values to update.
-    range: 'API Test!F1',  // TODO: Update placeholder value.
+    range: 'API Test!F1',
 
     // How the input data should be interpreted.
-    valueInputOption: 'RAW',  // TODO: Update placeholder value.
+    valueInputOption: 'USER_ENTERED',
     
     includeValuesInResponse: true,
     
@@ -75,15 +75,16 @@ function start() {
     responseDateTimeRenderOption: 'FORMATTED_STRING',
   };
 
+  var date = new Date();
   valueRangeBody = {
-    "values": [[Date.now()/1000/60/60/24]],
+    "values": [[date.getFullYear()+'-'+date.getMonth()+'-'+date.getDate()+' '+date.getHours()+':'+date.getMinutes()+':'+date.getSeconds()]],
   };
 
   request = gapi.client.sheets.spreadsheets.values.update(params, valueRangeBody);
   request.then(function(response) {
-    // TODO: Change code below to process the `response` object:
+    appendPre('\nUPDATE TEST');
     appendPre('Last Accessed:');
-    appendPre(response.result);
+    appendPre(response.result.updatedData.values);
   }, function(reason) {
     appendPre('Error: ' + reason.result.error.message);
   });
