@@ -17,8 +17,78 @@ function sign_out() {}
  */
 function start() {
   console.log('Starting!');
-  appendPre('Started successfully! Stand by…');
+  appendPre('Started successfully! Stand by…\n');
+  var params, request, valueRangeBody;
   
+  // TEST Cell Data GET
+  // See https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/get
+  params = {
+    // The ID of the spreadsheet to update.
+    spreadsheetId: '1k1mtGDWUmDmOh8qCV8CK5gcY6cIoKmG7KmS6hS-b49k',
+
+    // The A1 notation of the values to update.
+    range: 'API Test!B2:D',
+    
+    // How values should be represented in the output.
+    // The default render option is ValueRenderOption.FORMATTED_VALUE.
+    valueRenderOption: 'FORMATTED_VALUE',
+
+    // How dates, times, and durations should be represented in the output.
+    // This is ignored if value_render_option is
+    // FORMATTED_VALUE.
+    // The default dateTime render option is [DateTimeRenderOption.SERIAL_NUMBER].
+    dateTimeRenderOption: 'FORMATTED_STRING',
+  };
+  request = gapi.client.sheets.spreadsheets.values.get(params);
+  request.then(function(response) {
+    var range = response.result;
+    if (range.values.length > 0) {
+      appendPre('FETCH TEST\nCol.B2+, Col.D2+:');
+      for (i = 0; i < range.values.length; i++) {
+        var row = range.values[i];
+        // Print columns B and D, which correspond to indices 0 and 2.
+        appendPre(row[0] + ', ' + row[2]);
+      }
+    } else {
+      appendPre('No data found.');
+    }
+  }, function(response) {
+    appendPre('Error: ' + response.result.error.message);
+  });
+  
+  // Test Cell Data UPDATE
+  // See https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/update
+  params = {
+    // The ID of the spreadsheet to update.
+    spreadsheetId: '1k1mtGDWUmDmOh8qCV8CK5gcY6cIoKmG7KmS6hS-b49k',  // TODO: Update placeholder value.
+
+    // The A1 notation of the values to update.
+    range: 'API Test!F1',  // TODO: Update placeholder value.
+
+    // How the input data should be interpreted.
+    valueInputOption: 'RAW',  // TODO: Update placeholder value.
+    
+    includeValuesInResponse: true,
+    
+    responseValueRenderOption: 'FORMATTED_VALUE',
+    
+    responseDateTimeRenderOption: 'FORMATTED_STRING',
+  };
+
+  valueRangeBody = {
+    "values": [[Date.now()/1000/60/60/24]],
+  };
+
+  request = gapi.client.sheets.spreadsheets.values.update(params, valueRangeBody);
+  request.then(function(response) {
+    // TODO: Change code below to process the `response` object:
+    appendPre('Last Accessed:');
+    appendPre(response.result);
+  }, function(reason) {
+    appendPre('Error: ' + reason.result.error.message);
+  });
+  
+  /******** DOM INTERACTION STUFF ********/
   /**
    * Append a pre element to the body containing the given message
    * as its text node. Used to display the results of the API call.
