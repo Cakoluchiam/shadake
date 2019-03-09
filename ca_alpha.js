@@ -26,8 +26,11 @@ function start() {
     // The ID of the spreadsheet to update.
     spreadsheetId: '1k1mtGDWUmDmOh8qCV8CK5gcY6cIoKmG7KmS6hS-b49k',
 
-    // The A1 notation of the values to update.
+    // The A1 notation of the values to get.
     range: 'API Test!B2:D',
+    
+    // Whether to get as ROWS or COLUMNS
+    majorDimension: 'COLUMNS',
     
     // How values should be represented in the output.
     // The default render option is ValueRenderOption.FORMATTED_VALUE.
@@ -64,6 +67,9 @@ function start() {
 
     // The A1 notation of the values to update.
     range: 'API Test!F1',
+    
+    // Whether to get as ROWS or COLUMNS
+    majorDimension: 'COLUMNS',
 
     // How the input data should be interpreted.
     valueInputOption: 'USER_ENTERED',
