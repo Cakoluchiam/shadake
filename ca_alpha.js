@@ -1,4 +1,53 @@
 /**
+ * Generic item for content generation.
+ * Has a name and a catalog of categories it belongs to or is excluded from.
+ */
+function ContentItem(__name){
+  let __that = this;
+  let __categories = {};
+  
+  Object.defineProperties(__that,{
+    name: {value: __name},
+    toString: {get: (()=>{return (()=>{return __name;})})},
+    isA: {value: function(cat){return __categories[cat];}},
+    categories: {
+      /**
+       * Get all information about this item's categories, in the form {category1:membership1, ...}
+      **/
+      get: function() {
+        return Object.assign({},__categories);
+      },
+      /**
+       * Add information about the item's categories.
+       *
+       * @param {Object} keys are category names and values are whether or not the item is a member
+       *     OR {Array} of category names, all of whose memberships are set to true
+      **/
+      set: function(a) {
+        console.log('Existing category info will not be deleted. Use clearCategories() to remove existing categories.');
+        if(Array.isArray(a)) a.forEach(function(e) {__categories[e]=true;});
+        else Object.assign(__categories,a);
+        console.log(Object.assign({},__categories));
+      }
+    },
+    /**
+     * Delete all or some categories from the item
+     * NOTE: This will also remove category:false, which might be used to assert an item does not belong to a category.
+     *       Use `categories = {category:false}` to retain that information
+     *
+     * @param {array} (optional) list of categories whose information to discard; otherwise clears all
+    **/
+    clearCategories: {
+      value: function(cats) {
+        if(Array.isArray(cats))
+          cats.forEach(function(e){delete __categories[e];});
+        else __categories = {};
+      }
+    }
+  });
+}
+
+/**
  *  Here's where we do stuff. Well, first some housekeeping to make sure we're signed in and can manipulate the sheets.
  */
 
@@ -11,70 +60,6 @@ function sign_in() {
 // Anything special when the user signs out. Clean-up for reinitialization etc.
 // Called by sheets_auth.js whenever the user signs out
 function sign_out() {}
-
-var DEFAULT_SHEET = '1k1mtGDWUmDmOh8qCV8CK5gcY6cIoKmG7KmS6hS-b49k';
-
-/**
- * Simple get, returns range from default sheet as columns
- *
- * @param {string} A1 notation of range to get
- * @param {function} callback function (optional; defaults to console.log)
- * @param {function} error callback (optional; defaults to console.error)
- * @param {params} any special parameters, using GSheets API (optional)
- * @param {boolean} set TRUE if you want the CB called on the full response;
- * .                defaults to CB called only with the value array (optional)
- * .                (error is always called with full response)
- */
-function get(range, callback=console.log, error=console.error, params={}, cb_full=false) {
-  var request;
-  params = Object.assign({
-    spreadsheetId: DEFAULT_SHEET,
-    range: range,
-    majorDimension: 'COLUMNS'
-  },params);
-  
-  request = gapi.client.sheets.spreadsheets.values.get(params);
-  request.then(function(response){
-    if(cb_full) callback(response);
-    else callback(response.result.values);
-  }, error);
-}
-
-
-/**
- * Simple set, sets range to match an array of columns or a value
- *
- * @param {string} A1 notation of range to set
- * @param {Array or value} Array of column data, e.g. [['A1','A2',...],['B1','B2',...],...]
- * .                       if not passed an Array, will send value as [[value]]
- * @param {function} callback function (optional; defaults to none)
- * @param {function} error callback (optional; defaults to console.error)
- * @param {Object} any special parameters, using GSheets API
- * @param {Object} any special parameters to put into the values
- * @param {boolean} set TRUE if you want the CB called on the full response;
- * .                defaults to CB called only with the value array
- * .                (error is always called with full response)
- */
-function set(range, values, callback=function(){}, error=console.error, params={}, valueParams={}, cb_full=false) {
-  var request;
-  params = Object.assign({
-    spreadsheetId: DEFAULT_SHEET,
-    range: range,
-    valueInputOption: 'USER_ENTERED',
-    includeValuesInResponse: true
-  },params);
-  if(!Array.isArray(values)) values = [[values]];
-  valueParams = Object.assign({
-    values: values,
-    majorDimension: 'COLUMNS'
-  },valueParams);
-  
-  request = gapi.client.sheets.spreadsheets.values.update(params,valueParams);
-  request.then(function(response){
-    if(cb_full) callback(response);
-    else callback(response.result.updatedData.values);
-  }, error);
-}
 
 /**
  *  Here's where we ACTUALLY do stuff.
