@@ -9,7 +9,7 @@ function ContentItem(__name){
   Object.defineProperties(__that,{
     name: {value: __name},
     toString: {get: (()=>{return (()=>{return __name;})})},
-    isA: {value: function(cat){return __categories[cat];}},
+    isA: {value: function(cat){return __categories[cat.toLowerCase()];}},
     categories: {
       /**
        * Get all information about this item's categories, in the form {category1:membership1, ...}
@@ -25,8 +25,8 @@ function ContentItem(__name){
       **/
       set: function(a) {
         console.log('Existing category info will not be deleted. Use clearCategories() to remove existing categories.');
-        if(Array.isArray(a)) a.forEach(function(e) {__categories[e]=true;});
-        else Object.assign(__categories,a);
+        if(Array.isArray(a)) a.forEach(function(e) {__categories[String(e).toLowerCase()]=true;});
+        else Object.keys(a).forEach(function(e){__categories[String(e).toLowerCase()]=a[e];});
         console.log(Object.assign({},__categories));
       }
     },
@@ -40,7 +40,7 @@ function ContentItem(__name){
     clearCategories: {
       value: function(cats) {
         if(Array.isArray(cats))
-          cats.forEach(function(e){delete __categories[e];});
+          cats.forEach(function(e){delete __categories[String(e).toLowerCase()];});
         else __categories = {};
       }
     }
