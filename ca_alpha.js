@@ -69,7 +69,7 @@ function ReadObjectListFromFile(StructureName, Range)
         var row = range.values[i];
         var NewObject;
         for (j = 0; j < header.length; j++) {
-          Object.defineProperty(NewObject,header[j],row[j]);
+          NewObject[header[j]] = row[j];
         }
         ObjectLisr.push(NewObject);
       }
