@@ -47,6 +47,41 @@ function ContentItem(__name){
   });
 }
 
+function ReadObjectListFromFile(StructureName, Range)
+{
+  var params, request, valueRangeBody;
+  var ObjectList = [];
+
+  params = {
+    spreadsheetId: '1k1mtGDWUmDmOh8qCV8CK5gcY6cIoKmG7KmS6hS-b49k',
+    range: Range,
+    majorDimension: 'COLUMNS',
+    valueRenderOption: 'FORMATTED_VALUE',
+    dateTimeRenderOption: 'FORMATTED_STRING',
+  };
+  
+  request = gapi.client.sheets.spreadsheets.values.get(params);
+  request.then(function(response) {
+    var range = response.result;
+    if (range.values.length > 1) {
+      var header = range.values[0];
+      for (i = 1; i < range.values.length; i++) {
+        var row = range.values[i];
+        var NewObject;
+        for (j = 0; j < header.length; j++) {
+          Object.defineProperty(NewObject,header[j],row[j]);
+        }
+        ObjectLisr.push(NewObject);
+      }
+    }
+  }, function(response) {
+    appendPre('Error: ' + response.result.error.message);
+  });
+    appendPre('Loaded' + ObjectList.length + ' ' + StructureName);
+  
+  return ObjectList;
+}
+
 /**
  *  Here's where we do stuff. Well, first some housekeeping to make sure we're signed in and can manipulate the sheets.
  */
