@@ -47,11 +47,50 @@ function ContentItem(__name){
   });
 }
 
+function ChooseObjectFromList(ObjectList)
+{
+  var weights = [];
+  var rand, choice;
+  var total = 0;
+  
+  // Determine the weights we are going to use this time
+  for (i=0; i<ObjectList.length; i++)
+  {
+    var Object = ObjectList[i];
+    if (Object.hasOwnProperty("calculatedweight"))
+    {
+      weights[i] = Object.calculatedweight;
+    } else if (Object.hasOwnProperty("weight")) {
+      weights[i] = Object.weight;
+    } else {
+      weights[i] = 1;
+    }
+    total += weights[i];
+    if (i > 0)
+      weights[i] += weights[i-1];
+  }
+  
+  // Get the value we are seeking
+  rand = total * rand();
+  
+  // Find which i this value is for
+  for (i=0; i<weights.length; i++)
+  {
+    if (rand <= weights[i])
+      return ObjectList[i];
+  }
+  
+  return NULL;
+}
+
 function ReadObjectListFromFile(StructureName, Range)
 {
   var params, request, valueRangeBody;
   var ObjectList = [];
 
+  if (Range == '')
+    return NULL;
+  
   params = {
     spreadsheetId: '1k1mtGDWUmDmOh8qCV8CK5gcY6cIoKmG7KmS6hS-b49k',
     range: Range,
@@ -63,15 +102,19 @@ function ReadObjectListFromFile(StructureName, Range)
   request = gapi.client.sheets.spreadsheets.values.get(params);
   request.then(function(response) {
     var range = response.result;
-    if (range.values.length > 1) {
-      var header = range.values[0];
+    if (range.values.length > 2) {
+      ObjectList.name = range.values[0][0];
+      var header = range.values[1];
       for (i = 1; i < range.values.length; i++) {
         var row = range.values[i];
-        var NewObject;
-        for (j = 0; j < header.length; j++) {
-          NewObject[header[j]] = row[j];
+        if (row[0] != '')
+        {
+          var NewObject;
+          for (j = 0; j < header.length; j++) {
+            NewObject[header[j]] = row[j];
+          }
+          ObjectList.push(NewObject);
         }
-        ObjectLisr.push(NewObject);
       }
     }
   }, function(response) {
